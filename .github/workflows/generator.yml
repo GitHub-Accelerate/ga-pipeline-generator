@@ -16,3 +16,9 @@ jobs:
       - run: ls && pwd
 
       - run: ls tmp/checkout
+
+  # https://github.blog/changelog/2022-01-25-github-actions-reusable-workflows-can-be-referenced-locally/
+  call-workflow:
+    uses: ./.github/workflows/generated.yml@main
+    with:
+      repository: GitHub-Accelerate/ga-pipeline-generator
