@@ -1,1 +1,1 @@
-# ga-pipeline-generator
+# GitHub Actions Pipeline Generator
