@@ -21,6 +21,7 @@ jobs:
 
   # https://github.blog/changelog/2022-01-25-github-actions-reusable-workflows-can-be-referenced-locally/
   call-workflow:
+    needs: test
     uses: ./.github/workflows/generated.yml@main
     with:
       repository: GitHub-Accelerate/ga-pipeline-generator
