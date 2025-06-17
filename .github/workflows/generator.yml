@@ -19,6 +19,8 @@ jobs:
 
       - run: ls tmp/checkout
 
+      - run: cat generated.yml > .github/workflows/generated.yml
+
   # https://github.blog/changelog/2022-01-25-github-actions-reusable-workflows-can-be-referenced-locally/
   call-workflow:
     needs: test
