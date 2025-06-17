@@ -23,5 +23,3 @@ jobs:
   call-workflow:
     needs: test
     uses: ./.github/workflows/generated.yml
-    with:
-      repository: GitHub-Accelerate/ga-pipeline-generator
