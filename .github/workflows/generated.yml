@@ -1,9 +1,9 @@
 name: Run Go Program
 
-on: [push, pull_request, workflow_call]
+on: [workflow_call]
 
 jobs:
-  run-go:
+  called-workflow-job:
     runs-on: ubuntu-latest
 
     steps:
