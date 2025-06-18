@@ -55,11 +55,11 @@ jobs:
               echo "committed=false" >> $GITHUB_ENV
             else
               git commit -m "chore: add/update generated workflow"
-              git push
+              git push "https://x-access-token:${GH_WORKFLOW_WRITE}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${GITHUB_REF#refs/heads/}
               echo "committed=true" >> $GITHUB_ENV
             fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_WORKFLOW_WRITE: ${{ secrets.GH_WORKFLOW_WRITE }}
 
       - name: Abort workflow if committed
         if: env.committed == 'true'
