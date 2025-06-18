@@ -58,6 +58,8 @@ jobs:
               git push
               echo "committed=true" >> $GITHUB_ENV
             fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Abort workflow if committed
         if: env.committed == 'true'
