@@ -1,0 +1,14 @@
+name: Run Python Program
+
+on: [workflow_call]
+
+jobs:
+  called-workflow-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: echo "Building the Python program..."

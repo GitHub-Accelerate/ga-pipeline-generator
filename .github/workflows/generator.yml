@@ -2,38 +2,46 @@ name: Generate Pipeline
 
 on: [push, pull_request]
 
+permissions:
+  contents: write
+
 jobs:
-  test:
+  generate-workflow:
     runs-on: ubuntu-latest
-    outputs:
-      should_run1: ${{ steps.setvar.outputs.should_run1 }}
-      should_run2: ${{ steps.setvar.outputs.should_run2 }}
     steps:
-      - run: |
-          mkdir -p ./tmp
-          git clone https://github.com/actions/checkout.git ./tmp/checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: ./tmp/checkout
-        with:
-          repository: GitHub-Accelerate/ga-pipeline-generator
-          path: ga-pipeline-generator
-
-      - run: ls && pwd
-
-      - run: ls tmp/checkout
-
-      - id: setvar
+      - name: Check for .sh, .go, or .py files
+        id: detect
         run: |
-          echo "should_run1=false" >> $GITHUB_OUTPUT
-          echo "should_run2=true"  >> $GITHUB_OUTPUT
+          if git ls-files '*.sh' '*.go' '*.py' | grep .; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
 
-  # https://github.blog/changelog/2022-01-25-github-actions-reusable-workflows-can-be-referenced-locally/
-  call-workflow1:
-    needs: test
-    if: needs.test.outputs.should_run1 == 'true'
-    uses: ./.github/workflows/generated.yml
+      - name: Copy template if needed
+        if: steps.detect.outputs.found == 'true'
+        run: |
+          cp .github/workflows/generated-template.yml .github/workflows/generated.yml
 
-  call-workflow2:
-    needs: test
-    if: needs.test.outputs.should_run2 == 'true'
-    uses: ./.github/workflows/generated.yml
+      - name: Commit and push if generated.yml changed
+        if: steps.detect.outputs.found == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet .github/workflows/generated.yml; then
+            git add .github/workflows/generated.yml
+            git commit -m "chore: update generated workflow"
+            git push
+            echo "committed=true" >> $GITHUB_ENV
+          else
+            echo "committed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Abort workflow if committed
+        if: env.committed == 'true'
+        run: |
+          echo "Workflow updated and committed. Aborting current run."
+          exit 1
