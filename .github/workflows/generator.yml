@@ -21,10 +21,29 @@ jobs:
             echo "found=false" >> $GITHUB_OUTPUT
           fi
 
+          if git ls-files '*.sh' | grep .; then
+            echo "projecttype=bash" >> $GITHUB_OUTPUT
+          elif git ls-files '*.go' | grep .; then
+            echo "projecttype=go" >> $GITHUB_OUTPUT
+          elif git ls-files '*.py' | grep .; then
+            echo "projecttype=python" >> $GITHUB_OUTPUT
+          else
+            echo "projecttype=unknown" >> $GITHUB_OUTPUT
+          fi
+
       - name: Copy template if needed
         if: steps.detect.outputs.found == 'true'
         run: |
-          cp .github/workflows/generated-template.yml .github/workflows/generated.yml
+            if [ "${{ steps.detect.outputs.projecttype }}" == "bash" ]; then
+                cp .github/workflows/generated_bash.yml .github/workflows/generated.yml
+            elif [ "${{ steps.detect.outputs.projecttype }}" == "go" ]; then
+                cp .github/workflows/generated_go.yml .github/workflows/generated.yml
+            elif [ "${{ steps.detect.outputs.projecttype }}" == "python" ]; then
+                cp .github/workflows/generated_python.yml .github/workflows/generated.yml
+            else
+                echo "No valid project type found. Aborting."
+                exit 1
+            fi
 
       - name: Commit and push if generated.yml changed
         if: steps.detect.outputs.found == 'true'
