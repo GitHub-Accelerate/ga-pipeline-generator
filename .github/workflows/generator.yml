@@ -48,14 +48,17 @@ jobs:
       - name: Commit and push if generated.yml changed
         if: steps.detect.outputs.found == 'true'
         run: |
+          echo "Setting up Git for commit"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if ! git diff --quiet .github/workflows/generated.yml; then
+            echo "Preparing to commit changes"
             git add .github/workflows/generated.yml
             git commit -m "chore: update generated workflow"
             git push
             echo "committed=true" >> $GITHUB_ENV
           else
+            echo "No changes to commit"
             echo "committed=false" >> $GITHUB_ENV
           fi
 
