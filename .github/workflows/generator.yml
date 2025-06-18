@@ -69,4 +69,4 @@ jobs:
         if: env.committed == 'true'
         run: |
           echo "Workflow updated and committed. Aborting current run."
-          exit 1
+          exit 0
