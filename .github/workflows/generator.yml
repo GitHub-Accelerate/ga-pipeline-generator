@@ -46,6 +46,8 @@ jobs:
                 exit 1
             fi
 
+            sed -i 's/on: \[workflow_call\]/on: \[push, pull_request\]/' .github/workflows/generated.yml
+
       - name: Commit and push if generated.yml changed or is new
         if: steps.detect.outputs.found == 'true'
         run: |
