@@ -22,9 +22,10 @@ jobs:
 
       - run: ls tmp/checkout
 
-      - run: echo "should_run1=false" >> $GITHUB_OUTPUT
-
-      - run: echo "should_run2=true" >> $GITHUB_OUTPUT
+      - id: setvar
+        run: |
+          echo "should_run1=false" >> $GITHUB_OUTPUT
+          echo "should_run2=true"  >> $GITHUB_OUTPUT
 
   # https://github.blog/changelog/2022-01-25-github-actions-reusable-workflows-can-be-referenced-locally/
   call-workflow1:
