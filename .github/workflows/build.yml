@@ -14,6 +14,6 @@ jobs:
         image: 'ga-pipeline-generator-go'
         tag: '1.0.0'
         path: '.'
-        builder: 'gcr.io/paketo-buildpacks/builder:base'
+        builder: 'paketobuildpacks/builder-jammy-full'
         env: 'HELLO=WORLD FOO=BAR BAZ'
 
