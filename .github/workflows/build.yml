@@ -1,0 +1,19 @@
+name: Run Go Program using Packeto
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build image
+      uses: mamezou-tech/buildpacks-action@master
+      with:
+        image: 'ga-pipeline-generator-go'
+        tag: '1.0.0'
+        path: '.'
+        builder: 'gcr.io/paketo-buildpacks/builder:base'
+        env: 'HELLO=WORLD FOO=BAR BAZ'
+
