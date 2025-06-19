@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"math"
-	"math/rand"
 
 	"dagger/hello-dagger/internal/dagger"
 )
@@ -21,21 +18,23 @@ func (m *HelloDagger) Publish(
 	if err != nil {
 		return "", err
 	}
-	return m.Build(source).
-		Publish(ctx, fmt.Sprintf("ttl.sh/hello-dagger-%.0f", math.Floor(rand.Float64()*10000000))) //#nosec
+	buildOutput, err2 := m.Build(ctx, source)
+	if err2 != nil {
+		return "", err2
+	}
+	return buildOutput, nil
+	//m.Publish(ctx, fmt.Sprintf("ttl.sh/hello-dagger-%.0f", math.Floor(rand.Float64()*10000000))) //#nosec
 }
 
 // Build the application container
 func (m *HelloDagger) Build(
+	ctx context.Context,
 	// +defaultPath="/"
 	source *dagger.Directory,
-) *dagger.Container {
-	build := m.BuildEnv(source).
-		WithExec([]string{"go", "build", "code.go"}).
-		Directory("./dist")
-	return dag.Container().From("golang:1.25").
-		WithDirectory("/usr/share/nginx/html", build).
-		WithExposedPort(80)
+) (string, error) {
+	return m.BuildEnv(source).
+		WithExec([]string{"go", "build", "main.go"}). // Build your Go program
+		Stdout(ctx)
 }
 
 // Return the result of running unit tests
@@ -45,7 +44,7 @@ func (m *HelloDagger) Test(
 	source *dagger.Directory,
 ) (string, error) {
 	return m.BuildEnv(source).
-		WithExec([]string{"go", "test", "code_test.go"}).
+		WithExec([]string{"go", "test"}).
 		Stdout(ctx)
 }
 
@@ -56,7 +55,7 @@ func (m *HelloDagger) BuildEnv(
 ) *dagger.Container {
 	goCache := dag.CacheVolume("golang")
 	return dag.Container().
-		From("golang:1.25").
+		From("golang:latest").
 		WithDirectory("/src", source).
 		WithMountedCache("/go/pkg/mod", goCache).
 		WithWorkdir("/src").
