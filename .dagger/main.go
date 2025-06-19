@@ -31,9 +31,9 @@ func (m *HelloDagger) Build(
 	source *dagger.Directory,
 ) *dagger.Container {
 	build := m.BuildEnv(source).
-		WithExec([]string{"npm", "run", "build"}).
+		WithExec([]string{"go", "build", "code.go"}).
 		Directory("./dist")
-	return dag.Container().From("nginx:1.25-alpine").
+	return dag.Container().From("golang:1.25").
 		WithDirectory("/usr/share/nginx/html", build).
 		WithExposedPort(80)
 }
@@ -45,7 +45,7 @@ func (m *HelloDagger) Test(
 	source *dagger.Directory,
 ) (string, error) {
 	return m.BuildEnv(source).
-		WithExec([]string{"npm", "run", "test:unit", "run"}).
+		WithExec([]string{"go", "test", "code_test.go"}).
 		Stdout(ctx)
 }
 
@@ -54,11 +54,11 @@ func (m *HelloDagger) BuildEnv(
 	// +defaultPath="/"
 	source *dagger.Directory,
 ) *dagger.Container {
-	nodeCache := dag.CacheVolume("node")
+	goCache := dag.CacheVolume("golang")
 	return dag.Container().
-		From("node:21-slim").
+		From("golang:1.25").
 		WithDirectory("/src", source).
-		WithMountedCache("/root/.npm", nodeCache).
+		WithMountedCache("/go/pkg/mod", goCache).
 		WithWorkdir("/src").
-		WithExec([]string{"npm", "install"})
+		WithExec([]string{"go", "mod", "download"})
 }
