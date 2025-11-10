@@ -1,0 +1,18 @@
+name: Automatic pipeline
+
+on: [push, pull_request]
+
+permissions: write-all
+
+jobs:
+  generic-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Pipeline generation
+        uses: axdoomer/automatic-pipeline-generator@v1
+
+
+
