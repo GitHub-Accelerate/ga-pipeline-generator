@@ -3,7 +3,7 @@ name: Run Python Program
 on: [workflow_call]
 
 jobs:
-  called-workflow-job:
+  python-build:
     runs-on: ubuntu-latest
 
     steps:

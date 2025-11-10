@@ -3,7 +3,7 @@ name: Run Go Program
 on: [workflow_call]
 
 jobs:
-  called-workflow-job:
+  go-build:
     runs-on: ubuntu-latest
 
     steps:
