@@ -75,18 +75,13 @@ jobs:
         fi
       env:
         GH_WORKFLOW_WRITE: ${{ secrets.GH_WORKFLOW_WRITE }}
-  go-build:
+  python-build:
     runs-on: ubuntu-latest
-    if: needs.check-and-generate.outputs.workflow-updated != 'true'
-    needs: check-and-generate
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.21'
-
     - name: Build
-      run: echo "Building the Go program..."
+      run: echo "Building the Python program..."
+    needs: check-and-generate
