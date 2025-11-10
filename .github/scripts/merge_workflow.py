@@ -4,7 +4,7 @@ Merge workflow jobs from template files into the generator workflow.
 """
 import sys
 import os
-import yaml
+from ruamel.yaml import YAML
 
 
 def main():
@@ -15,13 +15,19 @@ def main():
     source_workflow_file = sys.argv[1]
     workflow_file = '.github/workflows/generator.yml'
     
+    # Create YAML instance that preserves formatting
+    yaml = YAML()
+    yaml.preserve_quotes = True
+    yaml.default_flow_style = False
+    yaml.width = 4096  # Prevent line wrapping
+    
     # Load current workflow
     with open(workflow_file, 'r') as f:
-        current_workflow = yaml.safe_load(f)
+        current_workflow = yaml.load(f)
     
     # Load source workflow template
     with open(source_workflow_file, 'r') as f:
-        source_workflow = yaml.safe_load(f)
+        source_workflow = yaml.load(f)
     
     # Extract the job from source workflow (should be the only job)
     source_jobs = source_workflow.get('jobs', {})
@@ -43,7 +49,9 @@ def main():
     check_and_generate_job = current_workflow['jobs'].get('check-and-generate')
     
     # Rebuild jobs dict with check-and-generate first, then the project-specific job
-    new_jobs = {}
+    # Use CommentedMap to preserve ordering
+    from ruamel.yaml.comments import CommentedMap
+    new_jobs = CommentedMap()
     if check_and_generate_job:
         new_jobs['check-and-generate'] = check_and_generate_job
     
@@ -54,7 +62,7 @@ def main():
     
     # Write updated workflow back to file
     with open(workflow_file, 'w') as f:
-        yaml.dump(current_workflow, f, default_flow_style=False, sort_keys=False, indent=2)
+        yaml.dump(current_workflow, f)
     
     print(f"Successfully updated workflow with '{source_job_name}' job from {source_workflow_file}")
     return 0
