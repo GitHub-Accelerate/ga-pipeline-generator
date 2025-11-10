@@ -38,9 +38,9 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install PyYAML
+      - name: Install ruamel.yaml
         if: steps.detect.outputs.found == 'true'
-        run: pip install PyYAML
+        run: pip install ruamel.yaml
 
       - name: Add job to workflow
         if: steps.detect.outputs.found == 'true'
